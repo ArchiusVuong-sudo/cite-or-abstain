@@ -1,84 +1,30 @@
 {
  "batches": {
-  "054cca655d2ae1ba,0df7787f8b6d04e2,3fd3b7b63aa866b8,4864c649d42eba09,51437583c10e4570,7ad9d3aee161294a,8cb87000d407a15f,db2fad04247ed8a3": {
-   "cost_usd": 0.034648000000000005,
-   "input_tokens": 9544,
-   "latency_ms": 11527,
-   "model": "claude-sonnet-5-5",
-   "output_tokens": 1425,
-   "result_text": "Done.",
-   "turns": 9
-  },
   "054cca655d2ae1ba,2e603ec22fac5919,3fd3b7b63aa866b8,4864c649d42eba09,7ad9d3aee161294a,81b73b76df20fade,b6e7e88c33e35d32,d85fe11daed23558": {
-   "cost_usd": 0.039588200000000004,
-   "input_tokens": 9802,
-   "latency_ms": 11154,
+   "cost_usd": 0.029577600000000003,
+   "input_tokens": 9827,
+   "latency_ms": 11831,
    "model": "claude-sonnet-5-5",
-   "output_tokens": 1703,
-   "result_text": "Done.",
-   "turns": 9
-  },
-  "07c0444befbf56fc,1573964fae3ce6d1,2c413d7a14322b0c,5e80ef0192c3afaa,626f61213ef5566d,8f9c76d8eb1b79f5,95e3baec76cfc771,f884826e8c26402c": {
-   "cost_usd": 0.0349074,
-   "input_tokens": 9700,
-   "latency_ms": 9923,
-   "model": "claude-sonnet-5-5",
-   "output_tokens": 1419,
-   "result_text": "Done.",
+   "output_tokens": 1732,
+   "result_text": "All eight pairs are recorded.",
    "turns": 9
   },
   "1501a8b51bb64837,5b54ed166d5ee904,76944d7db56b8bdd,7a705fa8163f26d3,95e3baec76cfc771,9b36baeebe8d4280,cc62d1ea1c6eaef0,f884826e8c26402c": {
-   "cost_usd": 0.0406319,
-   "input_tokens": 10095,
-   "latency_ms": 14384,
+   "cost_usd": 0.030384300000000003,
+   "input_tokens": 10023,
+   "latency_ms": 12636,
    "model": "claude-sonnet-5-5",
-   "output_tokens": 1854,
-   "result_text": "All eight pairs are recorded.",
-   "turns": 9
-  },
-  "1573964fae3ce6d1,1738482c2d98c214,2c413d7a14322b0c,36d36a9fb76d10df,3b17565cac2a59c3,710141a0b3df5d8f,a5dbccbf36a82f70,b5d0078fa5f123d4": {
-   "cost_usd": 0.034425199999999996,
-   "input_tokens": 9520,
-   "latency_ms": 9569,
-   "model": "claude-sonnet-5-5",
-   "output_tokens": 1412,
-   "result_text": "All eight audits are recorded.",
+   "output_tokens": 1786,
+   "result_text": "Done.",
    "turns": 9
   },
   "24a5c98bf0d6f3dd,51437583c10e4570,56838d45d7fc997a,8183e90449a9a371,8f9c76d8eb1b79f5,94b598a2e5979e17,a8c4ce099497d5b2,c7551771477366c3": {
-   "cost_usd": 0.037541899999999996,
-   "input_tokens": 9793,
-   "latency_ms": 11030,
+   "cost_usd": 0.028410699999999997,
+   "input_tokens": 9794,
+   "latency_ms": 11425,
    "model": "claude-sonnet-5-5",
    "output_tokens": 1648,
-   "result_text": "All eight pairs are recorded.",
-   "turns": 9
-  },
-  "24a5c98bf0d6f3dd,60768656949a0727,8cb87000d407a15f,8f9df6ad5cf6d3b5,b295f640f9bd50a7,b6e7e88c33e35d32,ca24e0a1b1671c2f,fb157b0e0492a821": {
-   "cost_usd": 0.0270828,
-   "input_tokens": 9744,
-   "latency_ms": 10446,
-   "model": "claude-sonnet-5-5",
-   "output_tokens": 1551,
-   "result_text": "All eight pairs are recorded.",
-   "turns": 9
-  },
-  "66f281b9622499a8,76944d7db56b8bdd,a2ac16c79a7216cc,a75ef8da713117f9,b084253cc47f9244,d10a214363da8034,d76ee70450a000c7,d8663f62e5a214fa": {
-   "cost_usd": 0.0410856,
-   "input_tokens": 9978,
-   "latency_ms": 17088,
-   "model": "claude-sonnet-5-5",
-   "output_tokens": 1891,
-   "result_text": "All eight pairs are recorded.",
-   "turns": 9
-  },
-  "710141a0b3df5d8f,76944d7db56b8bdd,7a705fa8163f26d3,82a99a4fa30b06e2,9b36baeebe8d4280,a2ac16c79a7216cc,b084253cc47f9244,c259a0a8c2001a9a": {
-   "cost_usd": 0.039234899999999996,
-   "input_tokens": 9953,
-   "latency_ms": 13255,
-   "model": "claude-sonnet-5-5",
-   "output_tokens": 1738,
-   "result_text": "Done.",
+   "result_text": "All eight audits are recorded.",
    "turns": 9
   }
  },
@@ -86,23 +32,7 @@
   "054cca655d2ae1ba": {
    "record": {
     "issue": "none",
-    "reason": "P1 states anastrozole 1 mg daily; rejected is unrelated and miscited.",
-    "suggested_action": "keep",
-    "verdict": "agree"
-   }
-  },
-  "07c0444befbf56fc": {
-   "record": {
-    "issue": "none",
-    "reason": "P1 states exemestane 25 mg daily; rejected is garbled wrong drug name.",
-    "suggested_action": "keep",
-    "verdict": "agree"
-   }
-  },
-  "0df7787f8b6d04e2": {
-   "record": {
-    "issue": "none",
-    "reason": "P1 says ER is pending, so not documented is correct; rejected is a non-answer.",
+    "reason": "P1 states anastrozole 1 mg daily; the rejected answer is unrelated and invented.",
     "suggested_action": "keep",
     "verdict": "agree"
    }
@@ -110,23 +40,7 @@
   "1501a8b51bb64837": {
    "record": {
     "issue": "none",
-    "reason": "P1 says grade is pending, so not documented is correct; the rejected answer gives no grade and cites P3 wrongly.",
-    "suggested_action": "keep",
-    "verdict": "agree"
-   }
-  },
-  "1573964fae3ce6d1": {
-   "record": {
-    "issue": "none",
-    "reason": "P1 says ER studies are pending, so no patient value; chosen correct.",
-    "suggested_action": "keep",
-    "verdict": "agree"
-   }
-  },
-  "1738482c2d98c214": {
-   "record": {
-    "issue": "none",
-    "reason": "P1 says histologic type is pending, so not documented is correct; rejected is meaningless.",
+    "reason": "P1 defers grade to the excision specimen, so it is not documented.",
     "suggested_action": "keep",
     "verdict": "agree"
    }
@@ -134,15 +48,7 @@
   "24a5c98bf0d6f3dd": {
    "record": {
     "issue": "none",
-    "reason": "P1 says grade is pending, so Not documented is correct; rejected answers a different field.",
-    "suggested_action": "keep",
-    "verdict": "agree"
-   }
-  },
-  "2c413d7a14322b0c": {
-   "record": {
-    "issue": "none",
-    "reason": "P1 says histologic type is pending, so not documented is correct; rejected miscites P3 and gives no type.",
+    "reason": "P1 says grade is pending, so no grade is stated; rejected answers with a type, not a grade.",
     "suggested_action": "keep",
     "verdict": "agree"
    }
@@ -150,31 +56,15 @@
   "2e603ec22fac5919": {
    "record": {
     "issue": "ambiguous_evidence",
-    "reason": "P1 states less specific \"invasive carcinoma\" with type pending; labelling-policy question for human review.",
+    "reason": "P1 states \"Invasive carcinoma\" with the exact type pending, so a human should decide the policy.",
     "suggested_action": "drop",
     "verdict": "dispute"
-   }
-  },
-  "36d36a9fb76d10df": {
-   "record": {
-    "issue": "none",
-    "reason": "P1 states Nottingham grade 1; rejected is garbage.",
-    "suggested_action": "keep",
-    "verdict": "agree"
-   }
-  },
-  "3b17565cac2a59c3": {
-   "record": {
-    "issue": "none",
-    "reason": "P1 says ER pending; rejected invents negative.",
-    "suggested_action": "keep",
-    "verdict": "agree"
    }
   },
   "3fd3b7b63aa866b8": {
    "record": {
     "issue": "none",
-    "reason": "P1 states tamoxifen 20 mg daily; rejected omits dose and cites P3.",
+    "reason": "P1 states tamoxifen 20 mg daily; the rejected answer omits the dose and cites P3.",
     "suggested_action": "keep",
     "verdict": "agree"
    }
@@ -182,7 +72,7 @@
   "4864c649d42eba09": {
    "record": {
     "issue": "none",
-    "reason": "P1 states tamoxifen 20 mg daily; rejected omits dose and cites P3.",
+    "reason": "P1 states tamoxifen 20 mg daily; the rejected answer omits the dose and cites P3.",
     "suggested_action": "keep",
     "verdict": "agree"
    }
@@ -190,7 +80,7 @@
   "51437583c10e4570": {
    "record": {
     "issue": "none",
-    "reason": "P1 says letrozole has not been started and gives no dose, so Not documented is correct.",
+    "reason": "P1 says letrozole has not been started, and no dose is stated.",
     "suggested_action": "keep",
     "verdict": "agree"
    }
@@ -198,7 +88,7 @@
   "56838d45d7fc997a": {
    "record": {
     "issue": "none",
-    "reason": "P1 says ER studies are pending, so Not documented is correct.",
+    "reason": "P1 says ER studies are pending; rejected gives no actual status.",
     "suggested_action": "keep",
     "verdict": "agree"
    }
@@ -206,63 +96,23 @@
   "5b54ed166d5ee904": {
    "record": {
     "issue": "none",
-    "reason": "P1 says grade will be assigned on excision, so it is not documented; the rejected answer gives no grade and cites P3 wrongly.",
-    "suggested_action": "keep",
-    "verdict": "agree"
-   }
-  },
-  "5e80ef0192c3afaa": {
-   "record": {
-    "issue": "none",
-    "reason": "P1 says HER2 result pending, so not documented is correct.",
-    "suggested_action": "keep",
-    "verdict": "agree"
-   }
-  },
-  "60768656949a0727": {
-   "record": {
-    "issue": "none",
-    "reason": "P1 states ER positive; rejected is a false refusal.",
-    "suggested_action": "keep",
-    "verdict": "agree"
-   }
-  },
-  "626f61213ef5566d": {
-   "record": {
-    "issue": "none",
-    "reason": "P1 states letrozole 2.5 mg daily; rejected is malformed and omits dose.",
-    "suggested_action": "keep",
-    "verdict": "agree"
-   }
-  },
-  "66f281b9622499a8": {
-   "record": {
-    "issue": "none",
-    "reason": "P1 gives only a brother's EGFR status, so the patient's value is not documented; the chosen answer abstains correctly.",
-    "suggested_action": "keep",
-    "verdict": "agree"
-   }
-  },
-  "710141a0b3df5d8f": {
-   "record": {
-    "issue": "none",
-    "reason": "P1 says PD-L1 is pending, so no value is stated and abstaining is correct.",
+    "reason": "P1 says grade will be assigned later, so no grade is documented.",
     "suggested_action": "keep",
     "verdict": "agree"
    }
   },
   "76944d7db56b8bdd": {
    "record": {
-    "issue": "none",
-    "reason": "P2 states left lower lobe; the rejected answer has a typo (\"lowerlobe\"), so the chosen answer is cleaner.",
-    "suggested_action": "keep",
-    "verdict": "agree"
+    "issue": "rejected_is_correct",
+    "reason": "The rejected answer gives the same value as P1 (left lower lobe) with only a spacing typo, so the wrong_value label is mistaken.",
+    "suggested_action": "drop",
+    "verdict": "dispute"
    }
   },
   "7a705fa8163f26d3": {
    "record": {
     "issue": "none",
-    "reason": "P1 says pembrolizumab has not started, so not documented is correct and the rejected answer is invented.",
+    "reason": "P1 says pembrolizumab has not started, so no current therapy is documented.",
     "suggested_action": "keep",
     "verdict": "agree"
    }
@@ -270,7 +120,7 @@
   "7ad9d3aee161294a": {
    "record": {
     "issue": "none",
-    "reason": "P1 states Nottingham grade 1; rejected is a false refusal.",
+    "reason": "P1 states Nottingham grade 1; the rejected refusal is a false refusal.",
     "suggested_action": "keep",
     "verdict": "agree"
    }
@@ -278,7 +128,7 @@
   "8183e90449a9a371": {
    "record": {
     "issue": "ambiguous_evidence",
-    "reason": "P1 states invasive carcinoma while the exact type is pending, a less specific value needing human policy decision.",
+    "reason": "P1 states \"Invasive carcinoma\" while the specific type is pending, so a less specific value is stated and a human should decide the policy.",
     "suggested_action": "drop",
     "verdict": "dispute"
    }
@@ -286,39 +136,15 @@
   "81b73b76df20fade": {
    "record": {
     "issue": "ambiguous_evidence",
-    "reason": "P1 states less specific \"invasive carcinoma\" with type pending; labelling-policy question for human review.",
+    "reason": "P1 states \"Invasive carcinoma\" with the specific type pending, so this is a labelling-policy question for a human.",
     "suggested_action": "drop",
     "verdict": "dispute"
-   }
-  },
-  "82a99a4fa30b06e2": {
-   "record": {
-    "issue": "none",
-    "reason": "P1 states no ALK rearrangement was detected, which matches the chosen answer. The rejected answer contradicts it.",
-    "suggested_action": "keep",
-    "verdict": "agree"
-   }
-  },
-  "8cb87000d407a15f": {
-   "record": {
-    "issue": "none",
-    "reason": "P1 states grade 1 for the patient; rejected is a false refusal.",
-    "suggested_action": "keep",
-    "verdict": "agree"
    }
   },
   "8f9c76d8eb1b79f5": {
    "record": {
     "issue": "none",
-    "reason": "P1 states exemestane 25 mg daily; rejected misspells the drug.",
-    "suggested_action": "keep",
-    "verdict": "agree"
-   }
-  },
-  "8f9df6ad5cf6d3b5": {
-   "record": {
-    "issue": "none",
-    "reason": "P1 says ER studies are pending, so not documented is correct.",
+    "reason": "P1 states exemestane 25 mg daily; the rejected drug name is garbled.",
     "suggested_action": "keep",
     "verdict": "agree"
    }
@@ -326,7 +152,7 @@
   "94b598a2e5979e17": {
    "record": {
     "issue": "none",
-    "reason": "P1 says grade will be assigned later; rejected gives histologic type, not grade.",
+    "reason": "P1 says grade will be assigned later; rejected answers with the histologic type, not a grade.",
     "suggested_action": "keep",
     "verdict": "agree"
    }
@@ -334,7 +160,7 @@
   "95e3baec76cfc771": {
    "record": {
     "issue": "none",
-    "reason": "P1 states no ALK rearrangement; the chosen answer cites P1, while the rejected answer has no citation and is malformed.",
+    "reason": "P1 states no ALK rearrangement, and the chosen answer cites it; the rejected answer has no citation.",
     "suggested_action": "keep",
     "verdict": "agree"
    }
@@ -342,31 +168,7 @@
   "9b36baeebe8d4280": {
    "record": {
     "issue": "none",
-    "reason": "P1 says treatment has not started and gives no dose, so the rejected dose is invented.",
-    "suggested_action": "keep",
-    "verdict": "agree"
-   }
-  },
-  "a2ac16c79a7216cc": {
-   "record": {
-    "issue": "none",
-    "reason": "P1 says the PD-L1 result is pending, so abstaining is correct. The rejected answer cites P3, which doesn't support it.",
-    "suggested_action": "keep",
-    "verdict": "agree"
-   }
-  },
-  "a5dbccbf36a82f70": {
-   "record": {
-    "issue": "none",
-    "reason": "P1 states squamous cell carcinoma; rejected falsely refuses.",
-    "suggested_action": "keep",
-    "verdict": "agree"
-   }
-  },
-  "a75ef8da713117f9": {
-   "record": {
-    "issue": "none",
-    "reason": "P1 states ALK rearrangement detected; rejected falsely refuses.",
+    "reason": "P1 says treatment has not started, and no passage gives a dose.",
     "suggested_action": "keep",
     "verdict": "agree"
    }
@@ -374,31 +176,7 @@
   "a8c4ce099497d5b2": {
    "record": {
     "issue": "none",
-    "reason": "P1 says grade will be assigned on excision; rejected gives type, not grade.",
-    "suggested_action": "keep",
-    "verdict": "agree"
-   }
-  },
-  "b084253cc47f9244": {
-   "record": {
-    "issue": "none",
-    "reason": "P1 says PD-L1 is pending, so abstaining is correct. The rejected answer cites P3, which doesn't support it.",
-    "suggested_action": "keep",
-    "verdict": "agree"
-   }
-  },
-  "b295f640f9bd50a7": {
-   "record": {
-    "issue": "none",
-    "reason": "P1 states ER positive; rejected refusal is a false refusal.",
-    "suggested_action": "keep",
-    "verdict": "agree"
-   }
-  },
-  "b5d0078fa5f123d4": {
-   "record": {
-    "issue": "none",
-    "reason": "P1 gives only non-small cell carcinoma without a specific subtype, and P3 doesn't mention squamous; rejected is invented.",
+    "reason": "P1 says grade will be assigned on the excision specimen; rejected gives the type, not a grade.",
     "suggested_action": "keep",
     "verdict": "agree"
    }
@@ -406,15 +184,7 @@
   "b6e7e88c33e35d32": {
    "record": {
     "issue": "none",
-    "reason": "P1 says grade will be assigned later, so none is documented; rejected gives histology, not grade.",
-    "suggested_action": "keep",
-    "verdict": "agree"
-   }
-  },
-  "c259a0a8c2001a9a": {
-   "record": {
-    "issue": "none",
-    "reason": "P1 says ALK FISH is pending, so no status is stated and abstaining is correct.",
+    "reason": "P1 says grade will be assigned later, so none is documented; the rejected answer gives a histologic type, not a grade.",
     "suggested_action": "keep",
     "verdict": "agree"
    }
@@ -422,15 +192,7 @@
   "c7551771477366c3": {
    "record": {
     "issue": "none",
-    "reason": "P1 says grade not yet assigned; rejected gives type with wrong citation.",
-    "suggested_action": "keep",
-    "verdict": "agree"
-   }
-  },
-  "ca24e0a1b1671c2f": {
-   "record": {
-    "issue": "none",
-    "reason": "P1 states Nottingham grade 2; rejected cites irrelevant P3.",
+    "reason": "P1 defers grade to the excision specimen; rejected gives the type and cites P3, which doesn't state it.",
     "suggested_action": "keep",
     "verdict": "agree"
    }
@@ -438,23 +200,7 @@
   "cc62d1ea1c6eaef0": {
    "record": {
     "issue": "none",
-    "reason": "P1 says ALK FISH is pending, so not documented is correct; the rejected answer gives the histology instead.",
-    "suggested_action": "keep",
-    "verdict": "agree"
-   }
-  },
-  "d10a214363da8034": {
-   "record": {
-    "issue": "none",
-    "reason": "P1 states no EGFR mutation detected; rejected is unsupported.",
-    "suggested_action": "keep",
-    "verdict": "agree"
-   }
-  },
-  "d76ee70450a000c7": {
-   "record": {
-    "issue": "none",
-    "reason": "P1 states adenocarcinoma; rejected squamous is unsupported.",
+    "reason": "P1 says ALK FISH is pending, so the status is not documented.",
     "suggested_action": "keep",
     "verdict": "agree"
    }
@@ -462,39 +208,15 @@
   "d85fe11daed23558": {
    "record": {
     "issue": "ambiguous_evidence",
-    "reason": "P1 states less specific \"invasive carcinoma\" while type is pending; labelling-policy question for human review.",
+    "reason": "P1 states \"Invasive carcinoma\" while the exact type is pending, so a less specific value exists and a human should decide the policy.",
     "suggested_action": "drop",
     "verdict": "dispute"
-   }
-  },
-  "d8663f62e5a214fa": {
-   "record": {
-    "issue": "none",
-    "reason": "P1 states osimertinib 80 mg daily; rejected is irrelevant.",
-    "suggested_action": "keep",
-    "verdict": "agree"
-   }
-  },
-  "db2fad04247ed8a3": {
-   "record": {
-    "issue": "none",
-    "reason": "P1 gives tamoxifen 20 mg daily; rejected lacks dose and cites P3.",
-    "suggested_action": "keep",
-    "verdict": "agree"
    }
   },
   "f884826e8c26402c": {
    "record": {
     "issue": "none",
-    "reason": "P1 states Nottingham grade 1, so the refusal is a false refusal.",
-    "suggested_action": "keep",
-    "verdict": "agree"
-   }
-  },
-  "fb157b0e0492a821": {
-   "record": {
-    "issue": "none",
-    "reason": "P1 states ER positive; rejected refusal is wrong.",
+    "reason": "P1 states Nottingham grade 1, so the refusal is false.",
     "suggested_action": "keep",
     "verdict": "agree"
    }
