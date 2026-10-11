@@ -20,7 +20,7 @@ Full video: https://github.com/ArchiusVuong-sudo/cite-or-abstain/releases/downlo
 ## Architecture
 
 ```mermaid
-flowchart LR
+flowchart TB
     A[Synthetic record generator] --> B[PHI scrub and leak gate]
     B --> C[BM25 retriever, top 3 passages]
     C --> D[Base model on Transformers]
