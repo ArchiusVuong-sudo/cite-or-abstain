@@ -14,8 +14,9 @@ os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
 
 
 def _cached(model_id: str) -> bool:
-    hub = Path(os.environ.get("HF_HOME", Path.home() / ".cache" / "huggingface")) / "hub"
-    return (hub / f"models--{model_id.replace('/', '--')}").exists()
+    from huggingface_hub.constants import HF_HUB_CACHE
+
+    return (Path(HF_HUB_CACHE) / f"models--{model_id.replace('/', '--')}").exists()
 
 
 if _cached(TINY_MODEL):

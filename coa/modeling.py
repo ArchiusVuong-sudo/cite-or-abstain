@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import os
 
-# Threaded weight loading hangs or crashes on Apple MPS with Transformers 5.x; load serially.
+# Threaded weight loading hangs or crashes on MPS with Transformers 5.x; load serially.
 os.environ.setdefault("HF_DEACTIVATE_ASYNC_LOAD", "1")
 os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
 os.environ.setdefault("PYTORCH_MPS_HIGH_WATERMARK_RATIO", "0.5")
