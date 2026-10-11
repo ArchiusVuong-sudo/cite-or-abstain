@@ -60,14 +60,16 @@ def run_recorded(conn: sqlite3.Connection, fixtures_dir: Path, progress: Callabl
     for line in path.read_text().splitlines():
         if line.strip():
             r = json.loads(line)
-            recorded[r["prompt_hash"]] = r
+            recorded[r["question_id"]] = r
     qs = question_views(conn, "train")
     missing = 0
     with db.tx(conn):
         conn.execute("DELETE FROM samples")
         for q in qs:
-            r = recorded.get(prompt_hash(q))
-            if r is None:
+            r = recorded.get(q.id)
+            # Two patients can share identical passages, so the key is the question id; the prompt hash
+            # only checks that the recording was made on this exact prompt.
+            if r is None or r["prompt_hash"] != prompt_hash(q):
                 missing += 1
                 continue
             _store(conn, q, r["model"], [(a["mode"], a["text"]) for a in r["answers"]], "recorded")
