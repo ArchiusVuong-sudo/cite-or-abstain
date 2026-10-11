@@ -1,4 +1,4 @@
-"""Deterministic typo injection for the robustness slice. Value words are never touched."""
+"""Deterministic typo injection for the typo slice. Value words are never touched."""
 
 from __future__ import annotations
 
