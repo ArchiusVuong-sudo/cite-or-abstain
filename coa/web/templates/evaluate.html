@@ -5,7 +5,7 @@
 <div class="head">
   <div>
     <h1>Held-out patients, three systems</h1>
-    <p>The base model, the base model with a 2-shot prompt, and the tuned adapter answer every question for the {{ summary.questions if summary else 144 }} test-split questions. Each rate shows k/n and a Wilson 95% interval. Settings were tuned on the dev split only.</p>
+    <p>The base model, the base model with a 2-shot prompt, and the tuned adapter answer every question for the {{ summary.questions if summary else 144 }} test-split questions. Each rate shows k/n and a Wilson 95% interval. Defaults were picked on the dev split during the build; this page scores the test split only.</p>
   </div>
   <button class="btn primary" data-job="eval" id="btn-eval">Run eval</button>
 </div>
@@ -50,7 +50,7 @@
     {% endfor %}
     </tbody>
   </table>
-  <p class="small muted" style="margin-top:10px">{% if slice == 'typo' %}Typo slice: the same questions with letter swaps and drops in about 1 of 5 non-value words of every passage; values and retrieval stay the same.{% else %}Invented: a value given where no retrieved passage states the patient's value. Citation validity: the cited passage states the value given.{% endif %}</p>
+  <p class="small muted" style="margin-top:10px">{% if slice == 'typo' %}Typo slice: the same questions, and in every passage the typo pass swaps, drops or doubles a letter in about 1 of 5 non-value words of 5 or more letters (about 1 in 11 words overall); values and retrieval stay the same.{% else %}Invented: a value given where no retrieved passage states the patient's value. Citation validity: the cited passage states the value given.{% endif %}</p>
 </section>
 
 {% if 'tuned' in m %}

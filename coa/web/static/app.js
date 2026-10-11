@@ -73,7 +73,16 @@
   }
 
   // ---------- charts ----------
-  function makeChart(id, color, yMin, yMax) {
+  // Plain tick labels: a near-flat first step otherwise prints ticks like 3.80000000E-7.
+  // 2 to 4 decimals, picked from the tick step so a flat line still gets distinct labels.
+  function tick(v, i, ticks) {
+    const n = Number(v);
+    const step = ticks && ticks.length > 1 ? Math.abs(ticks[1].value - ticks[0].value) : 1;
+    if (Math.abs(n) < step / 2) return "0";
+    return n.toFixed(Math.min(4, Math.max(2, Math.ceil(-Math.log10(step)))));
+  }
+
+  function makeChart(id, color, yMin, yMax, suggested) {
     const el = document.getElementById(id);
     if (!el || !window.Chart) return null;
     if (charts[id]) charts[id].destroy();
@@ -84,7 +93,8 @@
       options: { animation: false, responsive: true, maintainAspectRatio: false,
         plugins: { legend: { display: false } },
         scales: { x: { title: { display: true, text: "step" }, ticks: { maxTicksLimit: 7 }, grid: { display: false } },
-          y: { min: yMin, max: yMax, ticks: { maxTicksLimit: 5 } } } },
+          y: { min: yMin, max: yMax, suggestedMin: suggested && suggested[0], suggestedMax: suggested && suggested[1],
+            ticks: { maxTicksLimit: 5, callback: tick } } } },
     });
     return charts[id];
   }
@@ -106,7 +116,7 @@
     const box = document.getElementById("charts");
     if (!box) return;
     makeChart("c-loss", "#3554d1");
-    makeChart("c-margin", "#13795b");
+    makeChart("c-margin", "#13795b", undefined, undefined, [-0.05, 0.05]);
     makeChart("c-acc", "#6d3fc0", 0, 1);
     const run = box.dataset.run;
     if (run) {
