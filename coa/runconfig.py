@@ -8,11 +8,11 @@ from pydantic import BaseModel, Field
 class RunConfig(BaseModel):
     base_model: str
     beta: float = Field(0.1, gt=0, le=1)
-    learning_rate: float = Field(5e-5, gt=0, le=1e-2)
+    learning_rate: float = Field(1e-4, gt=0, le=1e-2)
     num_epochs: int = Field(2, ge=1, le=10)
     max_steps: int = Field(60, ge=-1, le=2000)  # -1 = run all epochs
-    micro_batch_size: int = Field(2, ge=1, le=64)
-    gradient_accumulation_steps: int = Field(4, ge=1, le=64)
+    micro_batch_size: int = Field(1, ge=1, le=64)
+    gradient_accumulation_steps: int = Field(8, ge=1, le=64)
     sequence_len: int = Field(768, ge=128, le=4096)
     lora_r: int = Field(16, ge=1, le=256)
     lora_alpha: int = Field(32, ge=1, le=512)
