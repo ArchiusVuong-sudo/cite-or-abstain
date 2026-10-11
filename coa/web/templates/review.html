@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% from "macros.html" import job_panel, last_job, lab %}
+{% block title %}Review{% endblock %}
+{% block content %}
+<div class="head">
+  <div>
+    <h1>An LLM audit, then a human decides</h1>
+    <p>Claude audits a sample of pairs in 3 batches of 8. It can only call one tool, <code>record_audit</code>, once per pair, and every input is validated. Pairs it disputes land in the queue below, where a reviewer approves, flips or drops them. Decisions change the exported training set.</p>
+  </div>
+  <button class="btn primary" data-job="audit" id="btn-audit" {{ 'disabled' if not has_pairs }}>Claude audit</button>
+</div>
+{{ job_panel('audit', active_job if active_job and active_job.kind == 'audit' else None) }}
+{{ last_job(audit_job) }}
+
+<section class="grid g-5-7" style="margin-top:16px">
+  <div class="stack">
+    <div class="card">
+      <div class="card-h"><h2>Audit calls</h2>{% if totals.source == 'recorded' %}<span class="badge warn">recorded</span>{% elif totals.source %}<span class="badge ok">live</span>{% endif %}</div>
+      {% if traces %}
+      <div class="grid g4" style="gap:10px; margin-bottom:12px">
+        <div class="counter"><div class="v">{{ stats.audited or 0 }}</div><div class="k">pairs audited</div></div>
+        <div class="counter"><div class="v">{{ stats.disputed or 0 }}</div><div class="k">disputed</div></div>
+        <div class="counter"><div class="v">{{ '%.1f' % (totals.latency_ms / 1000) }} s</div><div class="k">total latency</div></div>
+        <div class="counter"><div class="v">${{ '%.3f' % totals.cost_usd }}</div><div class="k">reported cost</div></div>
+      </div>
+      <div class="tablewrap">
+      <table id="traces">
+        <thead><tr><th>Batch</th><th>Latency</th><th>Turns</th><th>Tokens in / out</th><th>Cost</th><th></th></tr></thead>
+        <tbody>
+        {% for t in traces %}
+        <tr>
+          <td>{{ t.batch }} {% if t.error %}<span class="badge bad" title="{{ t.error }}">error</span>{% endif %}{% if t.attempts > 1 %}<span class="badge warn">{{ t.attempts }} tries</span>{% endif %}</td>
+          <td>{{ '%.1f s' % (t.latency_ms / 1000) if t.latency_ms else '-' }}</td>
+          <td>{{ t.turns or '-' }}</td>
+          <td class="mono small">{{ t.input_tokens or '-' }} / {{ t.output_tokens or '-' }}</td>
+          <td class="mono small">{{ ('$%.4f' % t.cost_usd) if t.cost_usd else '-' }}</td>
+          <td><button class="btn sm" hx-get="/partials/trace/{{ t.id }}" hx-target="#drawer-body" data-trace="{{ t.id }}">View trace</button></td>
+        </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+      </div>
+      <p class="small muted" style="margin-top:10px">Model {{ traces[0].model }}. Each call: no built-in tools, one in-process MCP tool, no settings files, strict MCP config, no session persistence, temp working folder, allowlisted env, at most 14 turns, retries with backoff on overload or rate limits.</p>
+      {% else %}
+      <div class="empty"><b>No audit yet</b>{{ 'Run the Claude audit to check a sample of pairs.' if has_pairs else 'Build pairs on the Data page first.' }}</div>
+      {% endif %}
+    </div>
+    <div class="card">
+      <h2 style="margin-bottom:10px">How the queue works</h2>
+      <div class="note-callout">Approve keeps the pair as is. Flip swaps chosen and rejected (the checker had it backwards). Drop removes the pair from the export. Keys: <kbd>A</kbd> <kbd>F</kbd> <kbd>D</kbd> act on the highlighted pair, <kbd>J</kbd> / <kbd>K</kbd> move.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-h"><h2>Review queue</h2></div>
+    <div class="counters" id="counters" style="margin-bottom:14px">
+      {% include "partials/counters.html" %}
+    </div>
+    <div id="queue">
+      {% for item in queue %}
+        {% set pair_id = item.pair_id %}
+        <div id="ri-{{ item.pair_id }}" hx-get="/partials/review-item/{{ item.pair_id }}" hx-trigger="load" hx-swap="outerHTML"><div class="ritem"><span class="spin"></span></div></div>
+      {% else %}
+      <div class="empty"><b>Nothing flagged</b>{{ 'Claude agreed with every audited pair.' if traces else 'Disputed pairs appear here after the audit.' }}</div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

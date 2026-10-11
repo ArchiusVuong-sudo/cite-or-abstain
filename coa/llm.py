@@ -266,6 +266,8 @@ AUDITOR_SYSTEM = (
     "result, a pending test, a plan or a drug that was not started do not count). "
     "Agree when the chosen answer is right and clearly better than the rejected one. Dispute when the chosen "
     "answer is wrong, when the rejected answer is actually acceptable, or when the evidence is ambiguous. "
+    "A less specific value that a passage does state (for example 'invasive carcinoma' while the exact type is "
+    "pending) is a labelling-policy question: dispute it as ambiguous_evidence so a human reviewer decides. "
     "Suggest keep, flip (swap chosen and rejected) or drop. Call record_audit exactly once per pair, then "
     "stop. Do not write anything else."
 )

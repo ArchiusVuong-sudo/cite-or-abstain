@@ -1,0 +1,26 @@
+{% from "macros.html" import lab %}
+<div data-drawer-title="Pair #{{ p.id }}: {{ field.label }}">
+  <div class="kv" style="margin-bottom:14px">
+    <dt>Question</dt><dd>{{ q.text }}</dd>
+    <dt>Gold</dt><dd>{% if q.gold.answerable %}{{ q.gold_display }} <span class="muted">(stated in P{{ q.gold.evidence | sort | join(', P') }})</span>{% else %}<b>{{ abstain }}</b>{% if q.trap %} <span class="badge accent">Trap: {{ q.trap | trap }}</span>{% endif %}{% endif %}</dd>
+    <dt>Patient</dt><dd class="mono">{{ q.patient_id }}</dd>
+  </div>
+  <h3>Retrieved passages</h3>
+  {% for ps in passages %}
+  <div class="passage {{ 'ev' if ps.evidence }}"><span class="pid">P{{ ps.n }}</span><span class="muted small">{{ ps.label }}</span><div>{{ ps.html }}</div></div>
+  {% endfor %}
+  <div class="grid g2" style="margin-top:14px">
+    <div class="answer chosen"><div class="h">Chosen <span class="badge">{{ 'model answer' if p.chosen_source == 'model' else 'reference' }}</span></div>{{ chosen_html }}</div>
+    <div class="answer rejected"><div class="h">Rejected {{ lab(p.rejected_label) }} <span class="badge">{{ 'model answer' if p.rejected_source == 'model' else 'perturbation' }}</span></div>{{ rejected_html }}</div>
+  </div>
+  {% if p.flipped or p.status == 'dropped' %}<p class="small" style="margin-top:10px"><span class="badge warn">{{ 'Dropped by reviewer' if p.status == 'dropped' else 'Flipped by reviewer' }}</span></p>{% endif %}
+  {% if audit %}
+  <div class="claude" style="margin-top:14px"><b>Claude audit:</b> {{ audit.verdict }} ({{ audit.issue }}), suggests {{ audit.suggested_action }}. {{ audit.reason }} {% if audit.source == 'recorded' %}<span class="badge warn">recorded</span>{% endif %}</div>
+  {% endif %}
+  <h3 style="margin-top:16px">Base model answers</h3>
+  <table>
+    <tbody>
+    {% for sm in samples %}<tr><td class="mono small" style="width:70px">{{ sm.mode }}</td><td class="small">{{ sm.text }}</td><td style="width:120px">{{ lab(sm.label) }}</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>

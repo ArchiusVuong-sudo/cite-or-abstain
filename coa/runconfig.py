@@ -43,6 +43,7 @@ class RunConfig(BaseModel):
                 "field_rejected": "rejected",
             }],
             "dataset_prepared_path": prepared_dir,
+            "dataset_num_proc": 2,
             "output_dir": output_dir,
             "adapter": "lora",
             "lora_r": self.lora_r,

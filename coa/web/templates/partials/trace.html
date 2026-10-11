@@ -1,0 +1,18 @@
+<div data-drawer-title="Audit call, batch {{ t.batch }}">
+  <div class="kv" style="margin-bottom:14px">
+    <dt>Model</dt><dd class="mono">{{ t.model }} {% if t.source == 'recorded' %}<span class="badge warn">recorded</span>{% else %}<span class="badge ok">live</span>{% endif %}</dd>
+    <dt>Started</dt><dd class="mono">{{ t.started_at }}</dd>
+    <dt>Latency</dt><dd>{{ '%.2f s' % (t.latency_ms / 1000) if t.latency_ms else '-' }}, {{ t.turns or '-' }} turns, {{ t.attempts }} attempt{{ 's' if t.attempts > 1 }}</dd>
+    <dt>Tokens</dt><dd>{{ t.input_tokens or '-' }} in, {{ t.output_tokens or '-' }} out</dd>
+    <dt>Cost</dt><dd>{{ ('$%.4f' % t.cost_usd) if t.cost_usd else '-' }}</dd>
+    {% if t.error %}<dt>Error</dt><dd><span class="badge bad">{{ t.error }}</span></dd>{% endif %}
+  </div>
+  <h3>record_audit calls ({{ t.calls | length }})</h3>
+  {% for c in t.calls %}
+  <div class="small">{% if c.ok %}<span class="badge ok">accepted</span>{% else %}<span class="badge bad">rejected: {{ c.error }}</span>{% endif %}</div>
+  <div class="payload">{{ c.input | tojson(indent=2) }}</div>
+  {% endfor %}
+  {% if t.result_text %}<h3>Final text</h3><p class="small" style="margin-bottom:12px">{{ t.result_text }}</p>{% endif %}
+  <h3>Prompt</h3>
+  <pre class="payload" style="max-height:340px; overflow:auto">{{ t.prompt }}</pre>
+</div>

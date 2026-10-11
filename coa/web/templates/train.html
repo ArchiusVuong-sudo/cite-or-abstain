@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% from "macros.html" import job_panel, last_job %}
+{% block title %}Train{% endblock %}
+{% block content %}
+<div class="head">
+  <div>
+    <h1>One config, two trainers</h1>
+    <p>The reviewed pairs export as Axolotl DPO data and YAML, checked by Axolotl's own <code>axolotl preprocess</code>. On this laptop the same settings run through TRL's DPOTrainer, the trainer Axolotl wraps for <code>rl: dpo</code>, with a LoRA adapter on {{ cfg.base_model }}.</p>
+  </div>
+</div>
+
+<section class="grid g-5-7">
+  <div class="card">
+    <div class="card-h">
+      <h2>Axolotl export</h2>
+      <button class="btn" data-job="axolotl" id="btn-axolotl" {{ 'disabled' if not export }}>Export Axolotl config</button>
+    </div>
+    {{ job_panel('axolotl', active_job if active_job and active_job.kind == 'axolotl' else None) }}
+    {{ last_job(ax_job) }}
+    {% if export %}
+    <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:12px" id="axolotl-badges">
+      {% if check and check.passed %}<span class="badge ok" id="preprocess-badge">axolotl preprocess passed</span>
+      {% elif check %}<span class="badge bad" id="preprocess-badge" title="{{ check.log[-300:] }}">axolotl preprocess failed</span>
+      {% else %}<span class="badge" id="preprocess-badge">not checked yet</span>{% endif %}
+      <span class="badge">dataset {{ export.dataset_hash }}</span>
+      <span class="badge">{{ export.rows | length }} pairs</span>
+      <span class="badge {{ 'ok' if not export.leaks else 'bad' }}">leak gate: {{ export.leaks | length }}</span>
+    </div>
+    <pre class="code" id="axolotl-yaml">{{ yaml or preview_yaml }}</pre>
+    {% if not yaml %}<p class="small muted" style="margin-top:6px">Preview. Export writes the YAML and JSONL for dataset {{ export.dataset_hash }}.</p>{% endif %}
+    {% else %}
+    <div class="empty"><b>No pairs to export</b>Build pairs on the Data page first.</div>
+    {% endif %}
+    <h3 style="margin-top:16px">Settings mapping</h3>
+    <div class="tablewrap scroll" style="max-height:260px">
+    <table id="mapping">
+      <thead><tr><th>Axolotl key</th><th>TRL / PEFT</th><th>Value</th></tr></thead>
+      <tbody>{% for a, t, v in mapping %}<tr><td class="mono small">{{ a }}</td><td class="mono small">{{ t }}</td><td class="mono small">{{ v }}</td></tr>{% endfor %}</tbody>
+    </table>
+    </div>
+    <p class="small muted" style="margin-top:10px"><code>axolotl train</code> needs a CUDA box (it imports triton at start-up, which has no macOS build). There: <code>axolotl train axolotl_dpo.yml</code>.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-h">
+      <div><h2>DPO + LoRA run</h2><p class="muted small">{{ cfg.max_steps }} steps, micro batch {{ cfg.micro_batch_size }} x {{ cfg.gradient_accumulation_steps }} accumulation, beta {{ cfg.beta }}, lr {{ cfg.learning_rate }}, fp32, sigmoid DPO loss plus an SFT term on the chosen answer.</p></div>
+      <button class="btn primary" data-job="train" id="btn-train" {{ 'disabled' if not export }}>Start</button>
+    </div>
+    {{ job_panel('train', active_job if active_job and active_job.kind == 'train' else None) }}
+    {{ last_job(train_job) }}
+    {% set shown = runs[0] if runs else None %}
+    <div class="charts" id="charts" data-run="{{ shown.id if shown else '' }}">
+      <div class="chartbox"><div class="t">DPO loss</div><canvas id="c-loss"></canvas></div>
+      <div class="chartbox"><div class="t">Reward margin (chosen - rejected)</div><canvas id="c-margin"></canvas></div>
+      <div class="chartbox"><div class="t">Reward accuracy</div><canvas id="c-acc"></canvas></div>
+    </div>
+    {% if runs %}
+    <h3 style="margin-top:16px">Runs</h3>
+    <div class="tablewrap">
+    <table id="runs">
+      <thead><tr><th>Run</th><th>Status</th><th>Dataset</th><th>Steps</th><th>Wall time</th><th>Device</th></tr></thead>
+      <tbody>
+      {% for r in runs %}{% set res = r.cfg.get('result', {}) %}
+      <tr><td class="mono">#{{ r.id }}</td><td><span class="badge {{ 'ok' if r.status == 'done' else 'bad' if r.status == 'error' else 'accent' }}">{{ r.status }}</span></td><td class="mono small">{{ r.dataset_hash or '-' }}</td><td>{{ res.get('steps', '-') }}</td><td>{{ ('%.0f s' % r.seconds) if r.seconds else '-' }}</td><td>{{ res.get('device', '-') }}</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    </div>
+    {% else %}
+    <div class="empty" style="margin-top:14px"><b>No runs yet</b>Start a run to stream loss, reward margin and reward accuracy here.</div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

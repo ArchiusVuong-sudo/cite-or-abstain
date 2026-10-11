@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 import sqlite3
 from dataclasses import dataclass
 
@@ -59,8 +60,18 @@ def perturb(q: QuestionView) -> tuple[str, str]:
     return f"{v.display} [P{min(q.gold.evidence)}]", Label.WRONG_VALUE.value
 
 
+CLEAN_VALUE = re.compile(r"^[^\[\]\n]{1,60} \[P\d\]\.?$")
+
+
+def clean_format(s: Sample) -> bool:
+    """Only well-formed answers of the model's own become the chosen side; others get the reference."""
+    if s.label == Label.CORRECT_ABSTAIN:
+        return s.text.strip() == ABSTAIN
+    return s.label == Label.CORRECT and bool(s.citation_valid) and bool(CLEAN_VALUE.match(s.text.strip()))
+
+
 def build_pair(q: QuestionView, samples: list[Sample]) -> Pair:
-    good = [s for s in samples if s.label == Label.CORRECT_ABSTAIN or (s.label == Label.CORRECT and s.citation_valid)]
+    good = [s for s in samples if clean_format(s)]
     good.sort(key=lambda s: s.mode != "greedy")
     chosen, chosen_src = (good[0].text, "model") if good else (reference_answer(q), "reference")
     for wanted in FAILURE_ORDER:
@@ -88,6 +99,7 @@ def build_all(conn: sqlite3.Connection) -> dict:
         conn.execute("DELETE FROM reviews")
         conn.execute("DELETE FROM audits")
         conn.execute("DELETE FROM pairs")
+        conn.execute("DELETE FROM sqlite_sequence WHERE name IN ('pairs', 'audits', 'reviews')")
         for q in qs:
             p = build_pair(q, by_q.get(q.id, []))
             conn.execute(

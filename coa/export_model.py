@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 import shutil
 import sqlite3
 import subprocess
@@ -12,6 +13,7 @@ from pathlib import Path
 from typing import Callable
 
 from . import db
+from .config import ROOT
 from .dataset import question_views
 from .evaluate import SYSTEM_LABELS
 from .prompts import messages
@@ -22,6 +24,11 @@ RATE_LABELS = {"invented_rate": "Invented-answer rate (undocumented fields)", "a
 
 
 def converter_path(data_dir: Path) -> Path:
+    """LLAMA_CPP_DIR, else <data dir>/llama.cpp, else the repo's var/llama.cpp (where the fetch script puts it)."""
+    env = os.environ.get("LLAMA_CPP_DIR")
+    for d in ([Path(env)] if env else []) + [data_dir / "llama.cpp", ROOT / "var" / "llama.cpp"]:
+        if (d / "convert_hf_to_gguf.py").exists():
+            return d / "convert_hf_to_gguf.py"
     return data_dir / "llama.cpp" / "convert_hf_to_gguf.py"
 
 

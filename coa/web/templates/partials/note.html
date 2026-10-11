@@ -1,0 +1,7 @@
+<div class="small muted" style="margin-bottom:8px">{{ patient.id }}: {{ patient.cancer }} cancer, {{ patient.split }} split. {% if view == 'raw' %}<span class="phi phi-raw">Original identifiers</span> as generated.{% else %}<span class="phi phi-scrubbed">Surrogates</span> replace {{ phi_count }} identifiers; dates shifted {{ patient.date_shift_days }} days.{% endif %}</div>
+{% for n in notes %}
+<div class="note">
+  <div class="t"><span>{{ n.title }}</span><span class="muted mono">{{ n.id }}</span></div>
+  <pre>{{ n.html }}</pre>
+</div>
+{% endfor %}

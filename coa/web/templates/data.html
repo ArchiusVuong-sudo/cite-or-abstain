@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% from "macros.html" import job_panel, last_job, lab %}
+{% block title %}Data & Pairs{% endblock %}
+{% block content %}
+<div class="head">
+  <div>
+    <h1>Turn the base model's own mistakes into preference data</h1>
+    <p>Synthetic oncology records are scrubbed of PHI and split by patient. BM25 picks 3 passages per registry question, the base model answers, and a rule-based checker labels each answer. Failing answers become the rejected side of DPO pairs.</p>
+  </div>
+</div>
+
+<section class="grid g4" id="summary">
+  <div class="card stat">
+    <div class="k">Patients</div>
+    <div class="v">{{ summary.patients }}</div>
+    <div class="sub">{{ summary.notes }} notes, {{ summary.passages }} passages, {{ summary.questions }} registry questions</div>
+    {% set br = (summary.splits.values() | sum(attribute='breast')) %}
+    <div class="legend"><span><i style="background:#3554d1"></i>Breast {{ br }}</span><span><i style="background:#6d3fc0"></i>Lung {{ summary.patients - br }}</span></div>
+  </div>
+  <div class="card stat" id="split-card">
+    <div class="k">Split by patient</div>
+    {% set sp = summary.splits %}
+    <div class="v">{{ sp.train.patients if sp.train }} / {{ sp.dev.patients if sp.dev }} / {{ sp.test.patients if sp.test }}</div>
+    <div class="splitbar">
+      {% for name, color in [('train', '#3554d1'), ('dev', '#8aa0ef'), ('test', '#13795b')] %}{% if sp[name] %}<span style="flex: {{ sp[name].patients }}; background: {{ color }}"></span>{% endif %}{% endfor %}
+    </div>
+    <div class="legend"><span><i style="background:#3554d1"></i>Train</span><span><i style="background:#8aa0ef"></i>Dev (tuning)</span><span><i style="background:#13795b"></i>Test (held out)</span></div>
+  </div>
+  <div class="card stat" id="phi-card">
+    <div class="k">PHI scrub</div>
+    <div class="v">{{ summary.phi_replacements }}</div>
+    <div class="sub">identifiers swapped for consistent surrogates; dates shifted per patient</div>
+    <div style="margin-top:8px" id="leak-gate">
+      {% if leak.note_leaks == 0 and leak.export_leaks == 0 %}
+      <span class="badge ok">Leak gate: 0 original identifiers</span>
+      {% else %}<span class="badge bad">Leak gate: {{ leak.note_leaks + leak.export_leaks }} found</span>{% endif %}
+      <span class="muted small">{{ leak.notes }} notes{% if leak.export_rows %}, {{ leak.export_rows }} JSONL rows{% endif %}</span>
+    </div>
+  </div>
+  <div class="card stat" id="retrieval-card">
+    <div class="k">Retrieval: BM25, top-{{ top_k }}</div>
+    <div class="v">{{ summary.recall.recall | pct }}</div>
+    <div class="sub">recall@{{ top_k }}: {{ summary.recall.hit }} of {{ summary.recall.documented }} documented fields have their stating passage in the top {{ top_k }}. One note section per passage.</div>
+  </div>
+</section>
+
+<section class="grid g-5-7" style="margin-top:16px">
+  <div class="card">
+    <div class="card-h">
+      <h2>Note viewer</h2>
+      <div style="display:flex; gap:8px; align-items:center">
+        <select id="patient-pick" name="patient" hx-get="/partials/note" hx-target="#note-view" hx-include="#note-mode" hx-trigger="change">
+          {% for p in patients %}<option value="{{ p.id }}" {{ 'selected' if p.id == patient }}>{{ p.id }} - {{ p.cancer }} - {{ p.split }}</option>{% endfor %}
+        </select>
+        <input type="hidden" id="note-mode" name="view" value="scrubbed">
+        <div class="seg" id="note-toggle">
+          <button data-view="raw">Raw</button><button data-view="scrubbed" class="on">Scrubbed</button>
+        </div>
+      </div>
+    </div>
+    <div id="note-view" class="scroll" style="max-height:610px" hx-get="/partials/note?patient={{ patient }}&view=scrubbed" hx-trigger="load"></div>
+  </div>
+
+  <div class="stack">
+    <div class="card">
+      <div class="card-h">
+        <div>
+          <h2>Sample the base model</h2>
+          <p class="muted small">{{ base_model }} answers all {{ summary.splits.train.patients * 6 if summary.splits.train }} train questions: greedy plus 2 samples at T=0.8, over its 3 retrieved passages.</p>
+        </div>
+        <button class="btn primary" data-job="sample" id="btn-sample">{{ 'Sample again' if samples.n else 'Sample base model' }}</button>
+      </div>
+      {% if samples.n %}
+      <div class="small muted">{{ samples.n }} answers labelled{% if samples.source == 'recorded' %} <span class="badge warn">recorded</span>{% else %} <span class="badge ok">live run</span>{% endif %}</div>
+      {% endif %}
+      {{ job_panel('sample', active_job if active_job and active_job.kind == 'sample' else None) }}
+      {{ last_job(sample_job) }}
+    </div>
+
+    <div class="card">
+      <div class="card-h">
+        <h2>Preference pairs</h2>
+        {% if mix.total %}<span class="muted small">{{ mix.total }} pairs: {{ mix.by_source.get('model', 0) }} from the model's own failures, {{ mix.by_source.get('perturbation', 0) }} labelled perturbations</span>{% endif %}
+      </div>
+      {% if mix.total %}
+      <div class="chips" id="pair-filter" style="margin-bottom:12px">
+        {% for key, name in [('all', 'All'), ('invented', 'Invented'), ('wrong_value', 'Wrong value'), ('false_refusal', 'False refusal'), ('non_answer', 'Non-answer')] %}
+        <button class="chip {{ 'on' if key == label }}" hx-get="/partials/pairs?label={{ key }}" hx-target="#pairs" data-chip="{{ key }}">{{ name }}<b>{{ mix.total if key == 'all' else mix.by_label.get(key, 0) }}</b></button>
+        {% endfor %}
+      </div>
+      <div id="pairs" hx-get="/partials/pairs?label={{ label }}" hx-trigger="load"></div>
+      {% else %}
+      <div class="empty"><b>No pairs yet</b>Sample the base model to label its answers and build pairs.</div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+<div id="pair-detail-anchor"></div>
+{% endblock %}

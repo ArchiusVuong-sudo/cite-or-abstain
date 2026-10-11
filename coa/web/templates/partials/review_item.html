@@ -1,0 +1,21 @@
+{% from "macros.html" import lab %}
+<div class="ritem {{ 'decided' if item and item.decision }}" id="ri-{{ p.id }}" data-pair="{{ p.id }}" data-decision="{{ item.decision if item and item.decision else '' }}" tabindex="-1">
+  <div class="card-h" style="margin-bottom:8px">
+    <div><b>Pair #{{ p.id }}</b> <span class="muted">{{ q.id }}: {{ q.text }}</span></div>
+    {% if item and item.decision %}<span class="badge {{ 'ok' if item.decision == 'approve' else 'warn' if item.decision == 'flip' else 'bad' }}">{{ {'approve': 'Approved', 'flip': 'Flipped', 'drop': 'Dropped'}[item.decision] }} {{ item.decided_at[11:19] }} UTC</span>{% else %}<span class="badge accent">pending</span>{% endif %}
+  </div>
+  {% for ps in passages %}
+  <div class="passage {{ 'ev' if ps.evidence }}"><span class="pid">P{{ ps.n }}</span><span class="muted small">{{ ps.label }}</span><div>{{ ps.html }}</div></div>
+  {% endfor %}
+  <div class="grid g2" style="margin-top:10px; gap:10px">
+    <div class="answer chosen"><div class="h">Chosen</div>{{ chosen_html }}</div>
+    <div class="answer rejected"><div class="h">Rejected {{ lab(p.rejected_label) }}</div>{{ rejected_html }}</div>
+  </div>
+  {% if audit %}<div class="claude" style="margin-top:10px"><b>Claude:</b> {{ audit.issue | replace('_', ' ') }}, suggests <b>{{ audit.suggested_action }}</b>. {{ audit.reason }}{% if audit.source == 'recorded' %} <span class="badge warn">recorded</span>{% endif %}</div>{% endif %}
+  <div style="display:flex; gap:8px; margin-top:12px">
+    <button class="btn sm" hx-post="/api/review/{{ p.id }}/approve" hx-target="#ri-{{ p.id }}" hx-swap="outerHTML" data-act="approve">Approve <kbd>A</kbd></button>
+    <button class="btn sm" hx-post="/api/review/{{ p.id }}/flip" hx-target="#ri-{{ p.id }}" hx-swap="outerHTML" data-act="flip">Flip <kbd>F</kbd></button>
+    <button class="btn sm" hx-post="/api/review/{{ p.id }}/drop" hx-target="#ri-{{ p.id }}" hx-swap="outerHTML" data-act="drop">Drop <kbd>D</kbd></button>
+  </div>
+</div>
+{% if oob %}<div class="counters" id="counters" hx-swap-oob="true">{% include "partials/counters.html" %}</div>{% endif %}

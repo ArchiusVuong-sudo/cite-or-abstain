@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% from "macros.html" import job_panel, last_job, lab %}
+{% block title %}Evaluate & Export{% endblock %}
+{% block content %}
+<div class="head">
+  <div>
+    <h1>Held-out patients, three systems</h1>
+    <p>The base model, the base model with a 2-shot prompt, and the tuned adapter answer every question for the {{ summary.questions if summary else 144 }} test-split questions. Each rate shows k/n and a Wilson 95% interval. Settings were tuned on the dev split only.</p>
+  </div>
+  <button class="btn primary" data-job="eval" id="btn-eval">Run eval</button>
+</div>
+{{ job_panel('eval', active_job if active_job and active_job.kind == 'eval' else None) }}
+{{ last_job(eval_job) }}
+
+{% if summary %}
+{% set m = summary.metrics[slice] %}
+{% set g = summary.gate %}
+{% if g.evaluated %}
+<div class="gate {{ 'pass' if g.passed else 'fail' }}" id="gate" style="margin:16px 0">
+  <b>Build gate {{ 'passed' if g.passed else 'not passed' }}</b>
+  <span>Invented-answer rate {{ '%.1f' % (g.invented_drop_vs_best_baseline * 100) }} points below the better baseline (needs 15). False refusals {{ '%+.1f' % (g.false_refusal_rise_vs_base * 100) }} points vs base (limit +10). Clean slice.</span>
+</div>
+{% endif %}
+<section class="card" style="margin-top:16px">
+  <div class="card-h">
+    <h2>Results, {{ summary.split }} split <span class="muted small" style="font-weight:400">{{ summary.n_undocumented }} undocumented and {{ summary.n_documented }} documented questions</span></h2>
+    <div class="seg" id="slice-toggle">
+      <a href="/evaluate?slice=clean&kind={{ kind }}" class="{{ 'on' if slice == 'clean' }}">Clean</a>
+      <a href="/evaluate?slice=typo&kind={{ kind }}" class="{{ 'on' if slice == 'typo' }}">Typo slice</a>
+    </div>
+  </div>
+  <table class="res" id="results">
+    <thead><tr><th style="width:26%">Rate</th>{% for s in systems if s in m %}<th>{{ system_labels[s] }}</th>{% endfor %}</tr></thead>
+    <tbody>
+    {% for key, name, hint in rate_keys %}
+    {% set lower_better = key in ('invented_rate', 'false_refusal_rate') %}
+    {% set vals = [] %}{% for s in systems if s in m and m[s][key].rate is not none %}{% set _ = vals.append(m[s][key].rate) %}{% endfor %}
+    {% set best = None if not vals else ((vals | min) if lower_better else (vals | max)) %}
+    <tr>
+      <td><b>{{ name }}</b><div class="muted small">{{ hint }}</div></td>
+      {% for s in systems if s in m %}{% set r = m[s][key] %}
+      <td class="{{ 'best' if r.rate is not none and r.rate == best }}">
+        {% if r.rate is none %}<span class="muted">n/a</span>{% else %}
+        <div class="rate">{{ r.rate | pct }}</div>
+        <div class="ci">{{ r.k }}/{{ r.n }}, 95% CI {{ '%.1f' % (r.lo * 100) }}-{{ '%.1f' % (r.hi * 100) }}</div>
+        <div class="cibar"><div class="iv" style="left: {{ r.lo * 100 }}%; width: {{ (r.hi - r.lo) * 100 }}%"></div><div class="pt" style="left: calc({{ r.rate * 100 }}% - 1px)"></div></div>
+        {% endif %}
+      </td>{% endfor %}
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  <p class="small muted" style="margin-top:10px">{% if slice == 'typo' %}Typo slice: the same questions with letter swaps and drops in about 1 of 5 non-value words of every passage; values and retrieval stay the same.{% else %}Invented: a value given where no retrieved passage states the patient's value. Citation validity: the cited passage states the value given.{% endif %}</p>
+</section>
+
+{% if 'tuned' in m %}
+<section class="card" style="margin-top:16px">
+  <div class="card-h">
+    <h2>What changed, base vs tuned <span class="muted small" style="font-weight:400">{{ slice }} slice</span></h2>
+    <div class="chips" id="diff-filter">
+      {% for key, name in [('all', 'All'), ('improved', 'Improved'), ('regressed', 'Regressed'), ('changed', 'Other change')] %}
+      <a class="chip {{ 'on' if key == kind }}" href="/evaluate?slice={{ slice }}&kind={{ key }}#diff" data-chip="{{ key }}">{{ name }}<b>{{ (counts.improved + counts.regressed + counts.changed) if key == 'all' else counts[key] }}</b></a>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="tablewrap scroll" id="diff" style="max-height:400px">
+  <table>
+    <thead><tr><th>Question</th><th>Gold</th><th>Base model</th><th>Tuned</th></tr></thead>
+    <tbody>
+    {% for d in diff %}{% set q = qs[d.question_id] %}
+    <tr data-kind="{{ d.kind }}">
+      <td><div class="mono small">{{ d.question_id }}</div><div class="muted small">{{ q.text }}</div>{% if q.trap %}<span class="badge accent">{{ q.trap | trap }}</span>{% endif %}</td>
+      <td class="small">{{ q.gold_display if q.gold.answerable else 'Not documented' }}</td>
+      <td class="small"><div>{{ d.before.text }}</div>{{ lab(d.before.label) }}</td>
+      <td class="small"><div>{{ d.after.text }}</div>{{ lab(d.after.label) }} {% if d.kind == 'improved' %}<span class="badge ok">improved</span>{% elif d.kind == 'regressed' %}<span class="badge bad">regressed</span>{% endif %}</td>
+    </tr>
+    {% else %}
+    <tr><td colspan="4"><div class="empty"><b>No answers in this group</b>Pick another filter.</div></td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  </div>
+  {% if diff_total > diff | length %}<p class="small muted" style="margin-top:8px">Showing {{ diff | length }} of {{ diff_total }}.</p>{% endif %}
+</section>
+{% endif %}
+{% else %}
+<div class="empty" style="margin-top:16px"><b>No evaluation yet</b>Run eval to score the base model, the 2-shot prompt{{ ' and the tuned adapter' if run else '' }} on held-out test patients.{% if not run %} Train a model first to include the tuned adapter.{% endif %}</div>
+{% endif %}
+
+<section class="card" style="margin-top:16px" id="export-card">
+  <div class="card-h">
+    <div><h2>Export</h2><p class="muted small">Merges the adapter into safetensors (for vLLM or TGI), reloads it to answer one test question, writes a model card, and converts to GGUF Q8_0 with the pinned llama.cpp converter.</p></div>
+    <button class="btn" data-job="export" id="btn-export" {{ 'disabled' if not run }}>Export</button>
+  </div>
+  {{ job_panel('export', active_job if active_job and active_job.kind == 'export' else None) }}
+  {{ last_job(export_job) }}
+  {% if exports %}
+  <div class="grid g-5-7">
+    <div class="tablewrap">
+    <table id="artifacts">
+      <thead><tr><th>Artifact</th><th>Status</th><th>Size</th></tr></thead>
+      <tbody>
+      {% for e in exports %}
+      <tr><td><b>{{ {'safetensors': 'Merged safetensors', 'model_card': 'Model card', 'gguf': 'GGUF Q8_0'}[e.kind] }}</b><div class="muted small">{{ e.note }}</div><div class="mono small muted">{{ e.path.split('/var/')[-1] if e.path else '' }}</div></td>
+      <td><span class="badge {{ 'ok' if e.status == 'done' else 'warn' }}">{{ e.status }}</span></td><td class="mono">{{ e.size_bytes | size }}</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    </div>
+    <div>{% if card %}<pre class="card-md" id="model-card">{{ card }}</pre>{% endif %}</div>
+  </div>
+  {% elif run %}
+  <div class="empty"><b>No artifacts yet</b>Export the tuned run #{{ run.id }}.</div>
+  {% else %}
+  <div class="empty"><b>Nothing to export</b>Train a model on the Train page first.</div>
+  {% endif %}
+</section>
+{% endblock %}

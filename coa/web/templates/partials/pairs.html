@@ -1,0 +1,19 @@
+{% from "macros.html" import lab %}
+<div class="tablewrap scroll" style="max-height:330px">
+<table>
+  <thead><tr><th>Pair</th><th>Question</th><th>Trap</th><th>Rejected</th><th>Source</th></tr></thead>
+  <tbody>
+  {% for r in rows %}
+  <tr class="click" hx-get="/partials/pair/{{ r.id }}" hx-target="#drawer-body" data-pair="{{ r.id }}" data-trap="{{ r.trap or '' }}" data-label="{{ r.rejected_label }}">
+    <td class="mono">#{{ r.id }}</td>
+    <td><div>{{ r.question_id }}</div><div class="muted small">{{ r.question }}</div></td>
+    <td>{% if r.trap %}<span class="badge accent">{{ r.trap | trap }}</span>{% else %}<span class="muted">-</span>{% endif %}</td>
+    <td>{{ lab(r.rejected_label) }}</td>
+    <td class="small">{{ 'Model' if r.rejected_source == 'model' else 'Perturbation' }}</td>
+  </tr>
+  {% else %}
+  <tr><td colspan="5"><div class="empty"><b>No pairs with this label</b>Try another filter.</div></td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>

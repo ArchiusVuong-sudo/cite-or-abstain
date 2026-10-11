@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Cite or Abstain{% endblock %} - Cite or Abstain</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="/static/app.css">
+  <script src="/static/vendor/htmx.min.js" defer></script>
+  <script src="/static/vendor/chart.umd.min.js" defer></script>
+  <script src="/static/app.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-in">
+      <a class="brand" href="/"><span class="brand-mark">C</span>Cite or Abstain</a>
+      <nav class="nav">
+        <a href="/" class="{{ 'on' if nav == 'data' }}"><span class="step">1</span>Data &amp; Pairs</a>
+        <a href="/review" class="{{ 'on' if nav == 'review' }}"><span class="step">2</span>Review</a>
+        <a href="/train" class="{{ 'on' if nav == 'train' }}"><span class="step">3</span>Train</a>
+        <a href="/evaluate" class="{{ 'on' if nav == 'evaluate' }}"><span class="step">4</span>Evaluate &amp; Export</a>
+      </nav>
+      {% if mode == 'replay' %}
+      <span class="mode replay" title="Audit verdicts and base-model answers come from recorded live runs"><span class="dot"></span>Replay mode</span>
+      {% else %}
+      <span class="mode live" title="Audit calls go to {{ audit_model }} through the local login"><span class="dot"></span>Live: {{ audit_model }}</span>
+      {% endif %}
+    </div>
+  </header>
+  <div class="synth"><div class="synth-in"><b>Synthetic data.</b> Every patient, note and identifier here is invented ({{ stamp }}). Not for clinical use.</div></div>
+  <main id="page" data-job-state="{{ active_job.state if active_job else 'idle' }}" {% if active_job %}data-active-job="{{ active_job.id }}" data-active-kind="{{ active_job.kind }}"{% endif %}>
+    <div id="content">
+      {% block content %}{% endblock %}
+    </div>
+  </main>
+  <div class="drawer-bg" id="drawer-bg"></div>
+  <aside class="drawer" id="drawer" aria-hidden="true">
+    <div class="dh"><h2 id="drawer-title">Trace</h2><button class="btn sm" data-close-drawer>Close <kbd>Esc</kbd></button></div>
+    <div class="db" id="drawer-body"></div>
+  </aside>
+</body>
+</html>

@@ -1,0 +1,10 @@
+{% macro job_panel(kind, job) -%}
+<div class="job {% if job and job.state in ('queued','running') %}show{% endif %}" id="job-{{ kind }}" data-kind="{{ kind }}">
+  <div class="row"><span class="msg"><span class="spin"></span> <span class="txt">{{ job.message if job else '' }}</span></span><span class="cnt muted"></span></div>
+  <div class="bar"><span></span></div>
+</div>
+{%- endmacro %}
+{% macro last_job(job) -%}
+{% if job and job.state == 'error' %}<div class="job show error"><div class="row"><span><b>Last run failed.</b> {{ job.error }}</span></div></div>{% endif %}
+{%- endmacro %}
+{% macro lab(v) -%}<span class="badge lab-{{ v }}">{{ v | label }}</span>{%- endmacro %}

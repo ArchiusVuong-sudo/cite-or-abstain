@@ -4,39 +4,73 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 import sqlite3
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Callable
 
 from . import db
+from .checker import canonical_value
 from .dataset import question_views
+from .fields import FIELDS, THERAPY_FIELDS
 from .llm import AuditProvider, BatchResult, record_replay
 
+VALUE_WORDS = re.compile(r"\b(none|no|not|negative|positive|detected|observed|wild|mutat\w*|deletion|grade|"
+                         r"carcinoma|lobe)\b|lobe|\d+\s*mg", re.I)
 N_BATCHES = 3
 BATCH_SIZE = 8
-PRIORITY = ["invented", "wrong_value", "false_refusal", "non_answer"]
 
 
 def _h(s: str) -> int:
     return int(hashlib.sha256(s.encode()).hexdigest(), 16)
 
 
+def _unknown_value_phrase(field: str, text: str) -> bool:
+    """A value-like phrase that names no value of this field and no value of a sibling field."""
+    if canonical_value(field, text) is not None or not VALUE_WORDS.search(text):
+        return False
+    cancer = FIELDS[field].cancer
+    return not any(canonical_value(f, text) for f, d in FIELDS.items() if d.cancer == cancer and f != field)
+
+
+def quoted_from_passage(answer: str, passages: list[str]) -> bool:
+    """The answer's words (2+ words, citation stripped) appear verbatim in a retrieved passage."""
+    core = re.sub(r"\[[^\]]*\]|\(P\d\)|\bP\d\b", " ", answer).strip(" .,;:\n").lower()
+    core = re.sub(r"\s+", " ", core)
+    return len(core.split()) >= 2 and any(core in re.sub(r"\s+", " ", t.lower()) for t in passages)
+
+
+def uncertainty(p: dict, passages: list[str] | None = None) -> int:
+    """How likely the rule-based checker got this pair wrong; the audit looks there first."""
+    score = 0
+    if p["rejected_source"] == "model":
+        score += 1
+        if p["rejected_label"] == "invented" and passages and quoted_from_passage(p["rejected"], passages):
+            score += 4  # "invented" words that a passage states: maybe a coarser true value, a label-policy call
+        if p["rejected_label"] == "wrong_value" and _unknown_value_phrase(p["field"], p["rejected"]):
+            score += 3  # a value-like phrase the checker does not know: "wrong" may be a phrasing it lacks
+        if p["field"] in THERAPY_FIELDS and canonical_value(p["field"], p["rejected"]) is not None:
+            score += 3  # right drug, missing or different dose
+        if p["rejected_label"] == "non_answer":
+            score += 1
+    if p["chosen_source"] == "model" and len(p["chosen"]) > 40:
+        score += 2  # a long chosen answer may carry unsupported extra claims
+    if p["trap"]:
+        score += 1
+    return score
+
+
 def select_pairs(conn: sqlite3.Connection, n: int = N_BATCHES * BATCH_SIZE) -> list[dict]:
-    """Deterministic sample: the model's own failures first (round-robin by label), then perturbations."""
-    pairs = db.rows(conn, "SELECT p.*, q.trap FROM pairs p JOIN questions q ON q.id = p.question_id "
+    """Deterministic sample of the pairs where the rules are least reliable, plus a few perturbations."""
+    pairs = db.rows(conn, "SELECT p.*, q.trap, q.field FROM pairs p JOIN questions q ON q.id = p.question_id "
                           "WHERE p.status = 'active'")
-    pairs.sort(key=lambda p: (p["trap"] is None, _h(p["content_hash"])))
-    buckets: dict[str, list[dict]] = {lab: [p for p in pairs if p["rejected_source"] == "model" and
-                                            p["rejected_label"] == lab] for lab in PRIORITY}
-    picked: list[dict] = []
-    while len(picked) < n and any(buckets.values()):
-        for lab in PRIORITY:
-            if buckets[lab] and len(picked) < n:
-                picked.append(buckets[lab].pop(0))
-    rest = [p for p in pairs if p["rejected_source"] == "perturbation"]
-    picked += rest[: max(0, n - len(picked))]
-    return sorted(picked, key=lambda p: p["id"])
+    texts = {q.id: [t for _, t in q.prompt_passages()] for q in question_views(conn, "train")}
+    pairs.sort(key=lambda p: (-uncertainty(p, texts.get(p["question_id"])), _h(p["content_hash"])))
+    n_perturbed = n // 6
+    model = [p for p in pairs if p["rejected_source"] == "model"][: n - n_perturbed]
+    perturbed = [p for p in pairs if p["rejected_source"] == "perturbation"][: n - len(model)]
+    return sorted(model + perturbed, key=lambda p: p["id"])
 
 
 def batch_prompt(conn: sqlite3.Connection, batch: list[dict]) -> str:
