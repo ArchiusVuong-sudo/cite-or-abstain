@@ -44,6 +44,8 @@
       setState(j.state === "queued" ? "running" : j.state);
       showProgress(kind, j);
       if (j.metrics) addMetrics(j.metrics);
+      const empty = document.getElementById("runs-empty");
+      if (kind === "train" && empty) empty.innerHTML = "<b>Training run in progress</b>The charts fill as each step is logged.";
     });
     es.addEventListener("end", async (ev) => {
       es.close();

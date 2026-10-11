@@ -67,7 +67,7 @@
     </table>
     </div>
     {% else %}
-    <div class="empty" style="margin-top:14px">{% if active_job and active_job.kind == 'train' %}<b>Training run in progress</b>The charts fill as each step is logged.{% else %}<b>No runs yet</b>Start a run to stream loss, reward margin and reward accuracy here.{% endif %}</div>
+    <div class="empty" id="runs-empty" style="margin-top:14px">{% if active_job and active_job.kind == 'train' %}<b>Training run in progress</b>The charts fill as each step is logged.{% else %}<b>No runs yet</b>Start a run to stream loss, reward margin and reward accuracy here.{% endif %}</div>
     {% endif %}
   </div>
 </section>

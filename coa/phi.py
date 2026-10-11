@@ -96,7 +96,8 @@ class Scrubber:
                 d = datetime.strptime(orig, "%m/%d/%Y") + timedelta(days=self.shift_days)
             except ValueError:
                 return orig
-            return note("date", orig, d.strftime("%m/%d/%Y"))
+            sur = self._sur("date", orig, lambda: d.strftime("%m/%d/%Y"))
+            return note("date", orig, sur)
 
         text = DATE_RE.sub(dt, text)
         return ScrubResult(text, out)
