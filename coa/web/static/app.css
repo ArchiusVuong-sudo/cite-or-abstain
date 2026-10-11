@@ -44,6 +44,7 @@ main { max-width: 1320px; margin: 0 auto; padding: 24px 28px 64px; }
 .head { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 20px; }
 .head p { color: var(--ink-2); max-width: 760px; }
 .grid { display: grid; gap: 16px; }
+.grid > * { min-width: 0; }
 .g4 { grid-template-columns: repeat(4, 1fr); }
 .g2 { grid-template-columns: 1fr 1fr; }
 .g-5-7 { grid-template-columns: 5fr 7fr; }

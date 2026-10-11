@@ -55,7 +55,8 @@ def write(conn: sqlite3.Connection, cfg: RunConfig, data_dir: Path) -> dict:
     out.mkdir(parents=True, exist_ok=True)
     data_path = out / "dpo_train.jsonl"
     data_path.write_text("".join(json.dumps(r) + "\n" for r in ex.rows))
-    conf = cfg.axolotl(str(data_path), str(out / "axolotl-out"), str(out / "prepared"))
+    # Paths are relative to the export folder; preprocess (and `axolotl train`) run from there.
+    conf = cfg.axolotl(data_path.name, "axolotl-out", "prepared")
     conf_path = out / "axolotl_dpo.yml"
     conf_path.write_text(yaml.safe_dump(conf, sort_keys=False))
     return {"dataset_hash": ex.dataset_hash, "rows": len(ex.rows), "data_path": str(data_path),

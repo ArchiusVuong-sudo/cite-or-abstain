@@ -101,7 +101,7 @@
       <thead><tr><th>Artifact</th><th>Status</th><th>Size</th></tr></thead>
       <tbody>
       {% for e in exports %}
-      <tr><td><b>{{ {'safetensors': 'Merged safetensors', 'model_card': 'Model card', 'gguf': 'GGUF Q8_0'}[e.kind] }}</b><div class="muted small">{{ e.note }}</div><div class="mono small muted">{{ e.path.split('/var/')[-1] if e.path else '' }}</div></td>
+      <tr><td><b>{{ {'safetensors': 'Merged safetensors', 'model_card': 'Model card', 'gguf': 'GGUF Q8_0'}[e.kind] }}</b><div class="muted small">{{ e.note }}</div><div class="mono small muted">{{ e.rel }}</div></td>
       <td><span class="badge {{ 'ok' if e.status == 'done' else 'warn' }}">{{ e.status }}</span></td><td class="mono">{{ e.size_bytes | size }}</td></tr>
       {% endfor %}
       </tbody>

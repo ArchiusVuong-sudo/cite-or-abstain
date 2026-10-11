@@ -117,10 +117,8 @@ def create_app() -> FastAPI:
             r["cfg"] = json.loads(r["config"])
         return page(request, "train", {"cfg": cfg, "mapping": cfg.mapping(), "export": ex, "check": check,
                                        "yaml": yaml_text, "ax_job": ax, "runs": runs,
-                                       "preview_yaml": yaml.safe_dump(cfg.axolotl("var/export/<hash>/dpo_train.jsonl",
-                                                                                  "var/export/<hash>/axolotl-out",
-                                                                                  "var/export/<hash>/prepared"),
-                                                                      sort_keys=False),
+                                       "preview_yaml": yaml.safe_dump(cfg.axolotl("dpo_train.jsonl", "axolotl-out",
+                                                                                  "prepared"), sort_keys=False),
                                        "train_job": jobs.latest(c, "train")})
 
     @app.get("/evaluate", response_class=HTMLResponse)
@@ -137,6 +135,8 @@ def create_app() -> FastAPI:
             rows = [r for r in rows if r["kind"] == kind]
         qs = {q.id: q for q in dataset.question_views(c, summary["split"])} if summary else {}
         exports = db.rows(c, "SELECT * FROM exports WHERE run_id=? ORDER BY id", run["id"]) if run else []
+        for e in exports:
+            e["rel"] = _rel(e["path"], s.data_dir)
         card = None
         for e in exports:
             if e["kind"] == "model_card" and e["path"] and Path(e["path"]).exists():
@@ -387,6 +387,15 @@ def _mark_phi(text: str, phi: list[dict], view: str) -> Markup:
         pat = re.compile("|".join(rf"(?<![\w]){re.escape(escape(t))}(?![\w])" for t in terms))
         html = pat.sub(lambda m: f'<span class="phi phi-{view}">{m.group(0)}</span>', html)
     return Markup(html)
+
+
+def _rel(path: str | None, base: Path) -> str:
+    if not path:
+        return ""
+    try:
+        return str(Path(path).relative_to(base))
+    except ValueError:
+        return Path(path).name
 
 
 def _size(n: int | None) -> str:
