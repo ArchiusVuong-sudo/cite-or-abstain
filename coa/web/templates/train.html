@@ -51,7 +51,7 @@
     {% set shown = runs[0] if runs else None %}
     <div class="charts" id="charts" data-run="{{ shown.id if shown else '' }}">
       <div class="chartbox"><div class="t">DPO loss</div><canvas id="c-loss"></canvas></div>
-      <div class="chartbox"><div class="t">Reward margin (chosen - rejected)</div><canvas id="c-margin"></canvas></div>
+      <div class="chartbox"><div class="t">Reward margin</div><canvas id="c-margin"></canvas></div>
       <div class="chartbox"><div class="t">Reward accuracy</div><canvas id="c-acc"></canvas></div>
     </div>
     {% if runs %}
@@ -67,7 +67,7 @@
     </table>
     </div>
     {% else %}
-    <div class="empty" style="margin-top:14px"><b>No runs yet</b>Start a run to stream loss, reward margin and reward accuracy here.</div>
+    <div class="empty" style="margin-top:14px">{% if active_job and active_job.kind == 'train' %}<b>Training run in progress</b>The charts fill as each step is logged.{% else %}<b>No runs yet</b>Start a run to stream loss, reward margin and reward accuracy here.{% endif %}</div>
     {% endif %}
   </div>
 </section>

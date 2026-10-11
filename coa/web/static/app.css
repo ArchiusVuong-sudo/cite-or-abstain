@@ -166,7 +166,10 @@ pre.card-md { white-space: pre-wrap; background: #fafbfc; border: 1px solid var(
 .gate.pass { background: var(--ok-soft); color: #0b5c45; }
 .gate.fail { background: var(--warn-soft); color: #7a4507; }
 .charts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
-.chartbox { border: 1px solid var(--line); border-radius: 8px; padding: 12px; height: 210px; }
+.chartbox { border: 1px solid var(--line); border-radius: 8px; padding: 12px; height: 210px; min-width: 0;
+  position: relative; overflow: hidden; }
+#mapping { table-layout: fixed; }
+#mapping td { overflow-wrap: anywhere; }
 .chartbox .t { font-size: 12.5px; font-weight: 600; color: var(--ink-2); margin-bottom: 4px; }
 .chartbox canvas { max-height: 170px; }
 
