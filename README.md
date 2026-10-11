@@ -64,7 +64,7 @@ flowchart LR
 | False-refusal rate (78 documented fields, lower is better) | 16.7% (13/78, CI 10.0-26.5) | 12.8% (10/78, CI 7.1-22.0) | 0.0% (0/78, CI 0.0-4.7) |
 | Citation validity (answers that state a value) | 9.0% (8/89, CI 4.6-16.7) | 36.1% (44/122, CI 28.1-44.9) | 94.0% (78/83, CI 86.7-97.4) |
 
-CI is the Wilson 95% interval. On the typo slice the tuned model scores 6.1% invented (4/66) and 100% accuracy (78/78). The build gate passed: invented answers 28.8 points below the better baseline, false refusals 16.7 points below the base model. The 2-shot prompt raises accuracy but invents far more often, because its examples teach the model to always produce a value. The audit of 24 pairs took 3 calls, 34 s in total and USD 0.12 as reported by the SDK, and disputed 5 pairs, all "invasive carcinoma" answers where the exact type was pending.
+CI is the Wilson 95% interval. On the typo slice the tuned model scores 6.1% invented (4/66) and 100% accuracy (78/78). The build gate passed: invented answers 28.8 points below the better baseline, false refusals 16.7 points below the base model. The 2-shot prompt (one cited answer and one family-history abstain as examples) raises accuracy on documented fields but more than doubles invented answers on undocumented ones. The audit of 24 pairs took 3 calls, 34 s in total and USD 0.12 as reported by the SDK, and disputed 5 pairs: 4 "invasive carcinoma" answers where the exact type was pending (a labelling-policy call), and 1 lobe answer that differed from the chosen one only by a missing space.
 
 **Trade-offs.** A 0.5B model keeps the loop to minutes on a laptop (202 s of training, 2 to 3 minutes of sampling and scoring), at the cost of a task far simpler than real registry abstraction. Retrieval recall is 100% on this synthetic set, so the eval measures grounding, not retrieval. Each long job runs in its own worker process, one at a time, with state in SQLite; a crash fails the job instead of the app.
 
@@ -99,7 +99,7 @@ Live audit calls use the Claude Agent SDK on your local Claude Code login, or `A
 ## Tests
 
 ```bash
-make test         # unit and end-to-end tests, replay mode, tiny test model, no network once cached
+make test         # unit and end-to-end tests, replay mode; the first run fetches a tiny test model, then no network
 make test-slow    # axolotl preprocess and GGUF conversion
 make test-live    # one real audit call (LIVE=1)
 ```
