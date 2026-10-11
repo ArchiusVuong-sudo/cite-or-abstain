@@ -50,6 +50,7 @@ def create_app() -> FastAPI:
     tpl.env.filters["pct"] = lambda v: "n/a" if v is None else f"{v * 100:.1f}%"
     tpl.env.filters["size"] = _size
     tpl.env.filters["fromjson"] = json.loads
+    tpl.env.filters["pretty"] = lambda v: json.dumps(v, indent=2, ensure_ascii=False)
     app.state.mode = provider_mode(s)
 
     def conn():
@@ -233,12 +234,12 @@ def create_app() -> FastAPI:
         c = conn()
         params: dict[str, Any] = {}
         if kind == "sample":
-            params = {"source": "recorded" if app.state.mode == "replay" else "live",
-                      "record": app.state.mode == "live"}
+            # The web app never writes fixtures/; only `make record-fixtures` re-records them.
+            params = {"source": "recorded" if app.state.mode == "replay" else "live", "record": False}
         elif kind == "audit":
             if not _has_pairs(c):
                 raise HTTPException(409, "Sample the base model first to build pairs")
-            params = {"provider": app.state.mode, "record": True}
+            params = {"provider": app.state.mode, "record": False}
         elif kind in {"axolotl", "train"}:
             if not _has_pairs(c):
                 raise HTTPException(409, "Sample the base model first to build pairs")

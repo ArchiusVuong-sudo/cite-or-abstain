@@ -10,7 +10,7 @@
   <h3>record_audit calls ({{ t.calls | length }})</h3>
   {% for c in t.calls %}
   <div class="small">{% if c.ok %}<span class="badge ok">accepted</span>{% else %}<span class="badge bad">rejected: {{ c.error }}</span>{% endif %}</div>
-  <div class="payload">{{ c.input | tojson(indent=2) }}</div>
+  <div class="payload">{{ c.input | pretty }}</div>
   {% endfor %}
   {% if t.result_text %}<h3>Final text</h3><p class="small" style="margin-bottom:12px">{{ t.result_text }}</p>{% endif %}
   <h3>Prompt</h3>

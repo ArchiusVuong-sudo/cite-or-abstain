@@ -45,6 +45,9 @@ def test_main_flow_replay(client):
     assert a["source"] == "replay" and a["pairs"] == 24 and a["disputed"] >= 3
     page = client.get("/review").text
     assert "recorded" in page and "Review queue" in page
+    trace_id = page.split('hx-get="/partials/trace/')[1].split('"')[0]
+    drawer = client.get(f"/partials/trace/{trace_id}").text
+    assert "\\u0027" not in drawer and "&#39;" in drawer  # quotes in tool payloads read as plain quotes
 
     summary = client.get("/api/summary").json()
     assert summary["review"]["flagged"] == a["disputed"]
@@ -78,3 +81,18 @@ def test_second_job_is_refused_while_one_runs(client):
     jid = r1.json()["id"]
     while client.get(f"/api/jobs/{jid}").json()["state"] not in ("done", "error"):
         time.sleep(0.3)
+
+
+def test_web_jobs_never_write_fixtures(client, monkeypatch):
+    """Only `make record-fixtures` writes fixtures/; a live run from the web app must not dirty a clone."""
+    from coa import jobs
+
+    seen = {}
+    monkeypatch.setattr(jobs, "start", lambda c, s, kind, params: seen.setdefault(kind, params) and 0)
+    monkeypatch.setattr(jobs, "get", lambda c, job_id: {"id": job_id})
+    client.app.state.mode = "live"
+    monkeypatch.setattr("coa.web.app._has_pairs", lambda c: True)
+    for kind in ("sample", "audit"):
+        assert client.post(f"/api/jobs/{kind}").status_code == 200
+    assert seen["sample"]["source"] == "live" and seen["audit"]["provider"] == "live"
+    assert not seen["sample"]["record"] and not seen["audit"]["record"]
