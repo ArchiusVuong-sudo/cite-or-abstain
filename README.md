@@ -2,7 +2,10 @@
 
 Preference-tunes a small open model, on a laptop, to answer cancer registry questions from synthetic oncology notes with a citation, or to say "Not documented in the provided notes." instead of inventing a value.
 
+On 24 held-out synthetic patients, invented answers fell from 36.4% for the base model to 4.5% for the tuned one in the recorded run, with 0 false refusals (4.5% to 9.1% across five runs; details under Recorded run).
+
 ![Demo](https://github.com/ArchiusVuong-sudo/cite-or-abstain/releases/download/v0.1/demo.gif)
+
 Full video: https://github.com/ArchiusVuong-sudo/cite-or-abstain/releases/download/v0.1/demo.mp4
 
 ## What it does
@@ -64,7 +67,7 @@ flowchart LR
 | False-refusal rate (78 documented fields, lower is better) | 16.7% (13/78, CI 10.0-26.5) | 12.8% (10/78, CI 7.1-22.0) | 0.0% (0/78, CI 0.0-4.7) |
 | Citation validity (answers that state a value) | 9.0% (8/89, CI 4.6-16.7) | 36.1% (44/122, CI 28.1-44.9) | 96.3% (78/81, CI 89.7-98.7) |
 
-CI is the Wilson 95% interval. On the typo slice the tuned model scores 4.5% invented (3/66) and 98.7% accuracy (77/78). The build gate passed: invented answers 31.8 points below the better baseline, false refusals 16.7 points below the base model. An earlier run of the same recipe gave 7.6% invented (5/66) and 94.0% citation validity (78/83). The 2-shot prompt (one cited answer and one family-history abstain as examples) raises accuracy on documented fields but more than doubles invented answers on undocumented ones. The audit of 24 pairs took 3 calls, 36 s in total and USD 0.09 as reported by the SDK, and disputed 5 pairs: 4 "invasive carcinoma" answers where the exact type was pending (a labelling-policy call), and 1 lobe answer that differed from the chosen one only by a missing space.
+CI is the Wilson 95% interval. On the typo slice the tuned model scores 4.5% invented (3/66) and 98.7% accuracy (77/78). The build gate passed: invented answers 31.8 points below the better baseline, false refusals 16.7 points below the base model. Across five runs of the same recipe the tuned model's invented-answer rate was 4.5% to 9.1% and the build gate passed each time, since DPO training on the Mac GPU (MPS) is not bit-for-bit repeatable; the table shows the recorded run. The 2-shot prompt (one cited answer and one family-history abstain as examples) raises accuracy on documented fields but more than doubles invented answers on undocumented ones. The audit of 24 pairs took 3 calls, 36 s in total and USD 0.09 as reported by the SDK, and disputed 5 pairs: 4 "invasive carcinoma" answers where the exact type was pending (a labelling-policy call), and 1 lobe answer that differed from the chosen one only by a missing space.
 
 **Trade-offs.** A 0.5B model keeps the loop to minutes on a laptop (216 s of training, 2 to 3 minutes of sampling and scoring), at the cost of a task far simpler than real registry abstraction. Retrieval recall is 100% on this synthetic set, so the eval measures grounding, not retrieval. Each long job runs in its own worker process, one at a time, with state in SQLite; a crash fails the job instead of the app.
 
